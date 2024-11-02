@@ -18,7 +18,8 @@ describe('Budget Tracking App Tests', () => {
     fireEvent.click(addExpenseButton);
 
     // Verify that the new expense shows up with correct values
-    expect(screen.getByText("Groceries")).toBeInTheDocument();
+    // expect(screen.getByText("Groceries")).toBeInTheDocument();
+    expect(screen.getByText("Groceries")).InTheDocument(); // delete 'toBe'
     expect(screen.getByText("$250")).toBeInTheDocument();
 
     // Check budget updates for "Remaining" and "Spent so far"

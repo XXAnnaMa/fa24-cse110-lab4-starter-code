@@ -9,7 +9,7 @@ export function createExpenseServer(req: Request, res: Response, expenses: Expen
     }
 
     const newExpense: Expense = {
-        id: id,
+        id,
         description,
         cost,
     };
@@ -20,15 +20,17 @@ export function createExpenseServer(req: Request, res: Response, expenses: Expen
 
 export function deleteExpense(req: Request, res: Response, expenses: Expense[]) {
     // TO DO: Implement deleteExpense function
-    const currLen = expenses.length;
-    const {id}  = req.params;
+    const { id } = req.params;
+    const expenseIndex = expenses.findIndex((expense) => expense.id === id);
 
-    const expenseInd = expenses.findIndex((expense) => expense.id === id);
-    expenses.splice(expenseInd, 1);
+    if (expenseIndex === -1) {
+        return res.status(404).send({ error: "Expense not found" });
+    }
 
-    res.status(201).send(id);
+    expenses.splice(expenseIndex, 1);
+    res.status(200).send({ message: "Expense deleted", id });
 }
 
 export function getExpenses(req: Request, res: Response, expenses: Expense[]) {
-    res.status(200).send({ "data": expenses });
+    res.status(200).send({ data: expenses });
 }

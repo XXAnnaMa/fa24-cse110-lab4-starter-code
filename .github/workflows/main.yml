@@ -13,9 +13,18 @@ jobs: # the things being executed
      - uses: actions/checkout@v4 # using version 4 of Actions
      - name: Install Dependencies
        run: 
+<<<<<<< HEAD
           cd client
           npm install
      - name: Unit Test
        run: 
           cd client
           npm test # the actual testing line
+=======
+           cd client
+           npm install
+     - name: Unit Test
+       run: 
+           cd client
+           npm test # the actual testing line
+>>>>>>> 20c9905cd46c54d79a2933d855cc824a640f2b76

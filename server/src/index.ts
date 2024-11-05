@@ -2,9 +2,8 @@ import { Request, Response } from "express";
 import { expenses, budget } from "./constants";
 import { createExpenseEndpoints } from "./expenses/expense-endpoints";
 import { createBudgetEndpoints } from "./budget/budget-endpoints";
-
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8080;

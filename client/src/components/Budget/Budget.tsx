@@ -4,61 +4,50 @@ import { fetchBudget, updateBudget } from "../../utils/budget-utils";
 
 const Budget = () => {
   const { budget, setBudget } = useContext(AppContext);
-  const [edit, setEdit] = useState(false);
+  const [text, setText] = useState(budget.toString());
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    loadBudget();
-    }, []);
-  
-    // Function to load expenses and handle errors
     const loadBudget = async () => {
-    try {
-      const budget = await fetchBudget();
-      setBudget(budget);
-    } catch (err: any) {
-      console.log(err.message);
-    }
+      try {
+        const fetchedBudget = await fetchBudget();
+        setBudget(fetchedBudget);
+        setText(fetchedBudget.toString());
+      } catch (err: any) {
+        console.log(err.message);
+      }
     };
+    loadBudget();
+  }, [setBudget]);
 
-  const handleEditClick = () => {
-    setEdit(!edit);
-    console.log(edit)
-  }
-
-  const handleSaveClick = () => {
-    setEdit(!edit);
-    updateBudget(budget);
-    setBudget(budget);
-  }
+  const handleSaveClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const newBudget = parseInt(text);
+    if (!isNaN(newBudget)) {
+      try {
+        await updateBudget(newBudget);
+        setBudget(newBudget);
+        setIsEditing(false);
+      } catch (err: any) {
+        console.log(err.message);
+      }
+    }
+  };
 
   return (
-    <div>
-      {
-        edit ? (<div>
-          <input
-            required
-            type="text"
-            className="form-control"
-            value={budget}
-            onChange={(event) => setBudget(parseInt(event.target.value))}
-          ></input>
-          <button type="submit" className="btn btn-primary mt-3" onClick={(event) => handleSaveClick()}>
-            Save
-          </button>
-          </div>
-        )
-          : (
-            <div className="alert alert-secondary p-3 d-flex align-items-center justify-content-between">
-              <div>Budget: {budget} <br />
-                <button type="button" className="btn btn-primary mt-3" onClick={handleEditClick}>
-                  Edit
-                </button>
-              </div>
-            </div>
-          )
-      }
+    <div className="alert alert-secondary p-3 d-flex align-items-center justify-content-between">
+      {isEditing ? (
+        <div>
+          <input type="text" className="form-control" value={text} onChange={(e) => setText(e.target.value)} />
+          <button onClick={handleSaveClick} className="btn btn-primary mt-3">Save</button>
+        </div>
+      ) : (
+        <div>
+          Budget: ${budget}
+          <button onClick={() => setIsEditing(true)} className="btn btn-primary mt-3">Edit</button>
+        </div>
+      )}
     </div>
-
   );
 };
 

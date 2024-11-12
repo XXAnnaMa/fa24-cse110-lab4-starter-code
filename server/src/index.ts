@@ -16,11 +16,15 @@ app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
 
+// Initialize database
+(async () => {
+   const db = await initDB();
+
 // Root endpoint to get test if the server is running
 app.get("/", (req: Request, res: Response) => {
-  res.send({ "data": "Hello, TypeScript Express!" });
-  res.status(200);
+   res.send({ "data": "Hello, TypeScript Express!" });
+   res.status(200);
 });
 
-createExpenseEndpoints(app, expenses);
+createExpenseEndpoints(app, db);
 createBudgetEndpoints(app, budget);

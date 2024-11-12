@@ -1,36 +1,41 @@
 import { Expense } from "../types";
 import { Request, Response } from "express";
+import { Database } from "sqlite";
 
-export function createExpenseServer(req: Request, res: Response, expenses: Expense[]) {
-    const { id, cost, description } = req.body;
+export async function createExpense(req: Request, res: Response, db: Database) {
+  try {
+    // Type casting the request body to the expected format.
+    const { id, cost, description } = req.body as { id: string; cost: number; description: string };
 
-    if (!description || !id || !cost) {
-        return res.status(400).send({ error: "Missing required fields" });
+    if (!id || !cost || !description) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    const newExpense: Expense = {
-        id,
-        description,
-        cost,
-    };
+    await db.run('INSERT INTO expenses (id, description, cost) VALUES (?, ?, ?);', [id, description, cost]);
+    res.status(201).json({ id, description, cost });
 
-    expenses.push(newExpense);
-    res.status(201).send(newExpense);
+  } catch (error) {
+    res.status(400).json({ error: `Failed to create expense: ${error}` });
+  }
 }
 
-export function deleteExpense(req: Request, res: Response, expenses: Expense[]) {
-    // TO DO: Implement deleteExpense function
-    const { id } = req.params;
-    const expenseIndex = expenses.findIndex((expense) => expense.id === id);
+export async function deleteExpense(req: Request, res: Response, db: Database) {
+  // TODO: Implement deleteExpense function
+  try {
+    const id = req.params.id;
 
-    if (expenseIndex === -1) {
-        return res.status(404).send({ error: "Expense not found" });
-    }
-
-    expenses.splice(expenseIndex, 1);
-    res.status(200).send({ message: "Expense deleted", id });
+    await db.run('DELETE FROM expenses WHERE id = ?;', [id]);
+    res.status(204).json({ message: "Expense successfully deleted" });
+  } catch (error) {
+    res.status(400).json({ error: `Failed to delete expense: ${error}` });
+  }
 }
 
-export function getExpenses(req: Request, res: Response, expenses: Expense[]) {
-    res.status(200).send({ data: expenses });
+export async function fetchExpenses(req: Request, res: Response, db: Database) {
+  try {
+    const expenses: Expense[] = await db.all('SELECT * FROM expenses;');
+    res.status(200).json({ data: expenses });
+  } catch (error) {
+    res.status(400).json({ error: `Could not retrieve expenses: ${error}` });
+  }
 }
